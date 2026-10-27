@@ -6,33 +6,33 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
 <div class="flex flex-col">
 <div class="flex items-center gap-space-xs">
-<span class="font-headline-lg text-headline-lg text-on-surface">Selamat Pagi, Ahmad</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">{{ $greeting }}, {{ auth()->user()->name }}</span>
 <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-secondary-container text-on-secondary-fixed">
 <span class="material-symbols-outlined text-[18px]">waving_hand</span>
 </span>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
-          Sabtu, 24 Mei 2025 <span class="mx-1.5 opacity-40">•</span> Ringkasan Finansial Anda
+          {{ $currentDateFormatted }} <span class="mx-1.5 opacity-40">•</span> Ringkasan Finansial Anda
         </p>
 </div>
 <!-- Action Buttons Header -->
 <div class="flex flex-wrap items-center gap-space-xs">
-<button class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md shadow-sm hover:brightness-95 active:scale-95 transition-all" id="btn-add-income" type="button">
+<a href="{{ route('transactions.create') }}" class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md shadow-sm hover:brightness-95 active:scale-95 transition-all" id="btn-add-income">
 <span class="material-symbols-outlined text-[18px]">add_circle</span>
 <span>+ Income</span>
-</button>
-<button class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-error-container text-on-error-container font-label-md text-label-md shadow-sm hover:brightness-95 active:scale-95 transition-all" id="btn-add-expense" type="button">
+</a>
+<a href="{{ route('transactions.create') }}" class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-error-container text-on-error-container font-label-md text-label-md shadow-sm hover:brightness-95 active:scale-95 transition-all" id="btn-add-expense">
 <span class="material-symbols-outlined text-[18px]">remove_circle</span>
 <span>− Expense</span>
-</button>
-<button class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-high active:scale-95 transition-all" id="btn-add-transfer" type="button">
+</a>
+<a href="{{ route('transactions.create') }}" class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-high active:scale-95 transition-all" id="btn-add-transfer">
 <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
 <span>↔ Transfer</span>
-</button>
-<button class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm hover:bg-surface-container hover:text-on-surface active:scale-95 transition-all" id="btn-new-wallet" type="button">
+</a>
+<a href="{{ route('wallets.index') }}" class="flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm hover:bg-surface-container hover:text-on-surface active:scale-95 transition-all" id="btn-new-wallet">
 <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
 <span>+ Dompet</span>
-</button>
+</a>
 </div>
 </div>
 <!-- Main Total Balance Vault Hero -->
@@ -49,7 +49,7 @@
 </span>
 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-[12px]">done_all</span>
-<span>Sinkronisasi Lokal Aktif</span>
+<span>Sinkronisasi Database Aktif</span>
 </span>
 </div>
 <div class="flex items-center gap-space-xs mt-1">
@@ -60,7 +60,7 @@
 </div>
 <div class="flex items-baseline gap-space-xs">
 <span class="font-headline-md text-headline-md text-primary-fixed-dim font-bold">Rp</span>
-<span class="font-display-lg text-display-lg text-on-primary font-bold tracking-tight" id="balance-value">500.000</span>
+<span class="font-display-lg text-display-lg text-on-primary font-bold tracking-tight" id="balance-value">{{ number_format($totalBalance, 0, ',', '.') }}</span>
 <span class="hidden font-display-lg text-display-lg text-on-primary font-bold tracking-widest leading-none" id="balance-masked">••••••••</span>
 </div>
 <p class="font-body-sm text-body-sm text-on-primary-container">
@@ -75,7 +75,7 @@
 </div>
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-primary-fixed-dim">Status Vault</span>
-<span class="font-headline-sm text-headline-sm text-on-primary leading-tight">3 Dompet</span>
+<span class="font-headline-sm text-headline-sm text-on-primary leading-tight">{{ $wallets->count() }} Dompet</span>
 </div>
 </div>
 <div class="hidden sm:block w-px h-8 bg-surface-container-lowest/15"></div>
@@ -84,8 +84,8 @@
 <span class="material-symbols-outlined text-[20px]">auto_graph</span>
 </div>
 <div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-primary-fixed-dim">Arus Kas Masuk</span>
-<span class="font-headline-sm text-headline-sm text-secondary-fixed leading-tight">+65% Net</span>
+<span class="font-label-sm text-label-sm text-primary-fixed-dim">Arus Kas Bersih</span>
+<span class="font-headline-sm text-headline-sm {{ $netCashflowPercentage >= 0 ? 'text-secondary-fixed' : 'text-error-container' }} leading-tight">{{ $netCashflowPercentage >= 0 ? '+' : '' }}{{ $netCashflowPercentage }}% Net</span>
 </div>
 </div>
 </div>
@@ -98,117 +98,68 @@
 <span class="material-symbols-outlined text-secondary text-[20px]">wallet</span>
 <h2 class="font-headline-sm text-headline-sm text-on-surface">Portofolio Dompet</h2>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Terakhir diperbarui: Hari ini 08:30 WIB</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Terakhir diperbarui: Hari ini {{ now()->format('H:i') }} WIB</span>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-<!-- 1. Cash Card -->
-<div class="group relative flex flex-col justify-between p-space-md bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all">
-<div class="flex items-start justify-between">
-<div class="flex items-center gap-space-sm">
-<div class="w-12 h-12 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shadow-sm">
-<span class="material-symbols-outlined text-[24px]">payments</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold">Cash</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Uang Tunai Dompet Fisik</span>
-</div>
-</div>
-<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Fisik</span>
-</div>
-<div class="my-space-md">
-<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Saldo Tersedia</span>
-<div class="flex items-baseline gap-1">
-<span class="font-body-md text-body-md text-on-surface-variant font-semibold">Rp</span>
-<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">100.000</span>
-</div>
-</div>
-<div class="flex items-center justify-between pt-space-xs">
-<button class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-on-secondary-container transition-colors" type="button">
-<span>Lihat Rincian</span>
-<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-</button>
-<div class="flex items-center gap-1 text-on-surface-variant">
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Catat Setoran" type="button">
-<span class="material-symbols-outlined text-[16px]">add</span>
-</button>
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Transfer Kas" type="button">
-<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
-</button>
-</div>
-</div>
-</div>
-<!-- 2. GoPay Card -->
-<div class="group relative flex flex-col justify-between p-space-md bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all">
-<div class="flex items-start justify-between">
-<div class="flex items-center gap-space-sm">
-<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-on-surface shadow-sm">
-<span class="material-symbols-outlined text-[24px]">qr_code_scanner</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold">GoPay</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">E-Wallet Akun Utama</span>
-</div>
-</div>
-<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">E-Wallet</span>
-</div>
-<div class="my-space-md">
-<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Saldo Tersedia</span>
-<div class="flex items-baseline gap-1">
-<span class="font-body-md text-body-md text-on-surface-variant font-semibold">Rp</span>
-<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">150.000</span>
-</div>
-</div>
-<div class="flex items-center justify-between pt-space-xs">
-<button class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-on-secondary-container transition-colors" type="button">
-<span>Lihat Rincian</span>
-<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-</button>
-<div class="flex items-center gap-1 text-on-surface-variant">
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Isi Saldo" type="button">
-<span class="material-symbols-outlined text-[16px]">add</span>
-</button>
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Kirim Saldo" type="button">
-<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
-</button>
-</div>
-</div>
-</div>
-<!-- 3. DANA Card -->
-<div class="group relative flex flex-col justify-between p-space-md bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all">
-<div class="flex items-start justify-between">
-<div class="flex items-center gap-space-sm">
-<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface shadow-sm">
-<span class="material-symbols-outlined text-[24px]">account_balance</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold">DANA</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">E-Wallet Operasional</span>
-</div>
-</div>
-<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">E-Wallet</span>
-</div>
-<div class="my-space-md">
-<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Saldo Tersedia</span>
-<div class="flex items-baseline gap-1">
-<span class="font-body-md text-body-md text-on-surface-variant font-semibold">Rp</span>
-<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">250.000</span>
-</div>
-</div>
-<div class="flex items-center justify-between pt-space-xs">
-<button class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-on-secondary-container transition-colors" type="button">
-<span>Lihat Rincian</span>
-<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-</button>
-<div class="flex items-center gap-1 text-on-surface-variant">
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Isi Saldo" type="button">
-<span class="material-symbols-outlined text-[16px]">add</span>
-</button>
-<button class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Kirim Saldo" type="button">
-<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
-</button>
-</div>
-</div>
-</div>
+@forelse($wallets as $wallet)
+  @php
+    $typeLower = strtolower($wallet->type);
+    $isCash = in_array($typeLower, ['cash', 'tunai', 'fisik']);
+    $isEwallet = in_array($typeLower, ['gopay', 'ovo', 'dana', 'shopeepay', 'e-wallet', 'digital']);
+    $icon = $isCash ? 'payments' : ($isEwallet ? 'qr_code_scanner' : 'account_balance');
+    $iconBg = $isCash ? 'bg-secondary-fixed text-on-secondary-fixed' : ($isEwallet ? 'bg-surface-container-highest text-on-surface' : 'bg-surface-container-high text-on-surface');
+    $badgeBg = $isCash ? 'bg-surface-container text-on-surface-variant' : 'bg-secondary-fixed text-on-secondary-fixed';
+  @endphp
+  <div class="group relative flex flex-col justify-between p-space-md bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all">
+  <div class="flex items-start justify-between">
+  <div class="flex items-center gap-space-sm">
+  <div class="w-12 h-12 rounded-xl {{ $iconBg }} flex items-center justify-center shadow-sm">
+  <span class="material-symbols-outlined text-[24px]">{{ $icon }}</span>
+  </div>
+  <div class="flex flex-col">
+  <span class="font-label-lg text-label-lg text-on-surface font-semibold">{{ $wallet->name }}</span>
+  <span class="font-label-sm text-label-sm text-on-surface-variant">Saldo Awal: Rp{{ number_format($wallet->initial_balance, 0, ',', '.') }}</span>
+  </div>
+  </div>
+  <span class="px-2 py-0.5 rounded-full {{ $badgeBg }} font-label-sm text-label-sm">{{ ucfirst($wallet->type) }}</span>
+  </div>
+  <div class="my-space-md">
+  <span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Saldo Tersedia</span>
+  <div class="flex items-baseline gap-1">
+  <span class="font-body-md text-body-md text-on-surface-variant font-semibold">Rp</span>
+  <span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">{{ number_format($wallet->current_balance, 0, ',', '.') }}</span>
+  </div>
+  </div>
+  <div class="flex items-center justify-between pt-space-xs">
+  <a href="{{ route('wallets.index') }}" class="flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-on-secondary-container transition-colors">
+  <span>Lihat Rincian</span>
+  <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+  </a>
+  <div class="flex items-center gap-1 text-on-surface-variant">
+  <a href="{{ route('transactions.create') }}" class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Catat Transaksi">
+  <span class="material-symbols-outlined text-[16px]">add</span>
+  </a>
+  <a href="{{ route('transactions.create') }}" class="w-7 h-7 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center transition-colors" title="Transfer Kas">
+  <span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+  </a>
+  </div>
+  </div>
+  </div>
+@empty
+  <div class="col-span-full py-12 px-4 text-center bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/40">
+    <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-3 text-on-surface-variant">
+      <span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+    </div>
+    <h4 class="font-label-lg text-label-lg font-semibold text-on-surface">Belum Ada Dompet</h4>
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+      Tambahkan dompet pertama Anda untuk mulai mengelola keuangan secara mandiri.
+    </p>
+    <a href="{{ route('wallets.index') }}" class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:opacity-90 transition-opacity">
+      <span class="material-symbols-outlined text-[16px]">add</span>
+      <span>+ Buat Dompet Baru</span>
+    </a>
+  </div>
+@endforelse
 </div>
 </div>
 <!-- FINANCIAL SUMMARY (3 Logic Metric Cards) -->
@@ -223,12 +174,12 @@
 </div>
 <div class="mt-space-md">
 <div class="font-numerical-balance text-numerical-balance text-secondary font-bold tracking-tight">
-            +Rp1.000.000
+            +Rp{{ number_format($totalIncome, 0, ',', '.') }}
           </div>
 <div class="flex items-center gap-1.5 mt-1">
 <span class="material-symbols-outlined text-secondary text-[16px]">trending_up</span>
-<span class="font-label-sm text-label-sm text-on-secondary-fixed font-semibold">2 Mutasi Penerimaan</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">• Mei 2025</span>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed font-semibold">{{ $incomeCount }} Mutasi Penerimaan</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• {{ $periodName }}</span>
 </div>
 </div>
 </div>
@@ -242,12 +193,12 @@
 </div>
 <div class="mt-space-md">
 <div class="font-numerical-balance text-numerical-balance text-error font-bold tracking-tight">
-            -Rp350.000
+            -Rp{{ number_format($totalExpense, 0, ',', '.') }}
           </div>
 <div class="flex items-center gap-1.5 mt-1">
 <span class="material-symbols-outlined text-error text-[16px]">pie_chart</span>
-<span class="font-label-sm text-label-sm text-on-error-container font-semibold">3 Transaksi Tercatat</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">• Rasio 35%</span>
+<span class="font-label-sm text-label-sm text-on-error-container font-semibold">{{ $expenseCount }} Transaksi Tercatat</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• Rasio {{ $expenseRatio }}%</span>
 </div>
 </div>
 </div>
@@ -261,10 +212,10 @@
 </div>
 <div class="mt-space-md">
 <div class="font-numerical-balance text-numerical-balance text-on-surface font-bold tracking-tight">
-            Rp200.000
+            Rp{{ number_format($totalTransfer, 0, ',', '.') }}
           </div>
 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-            Netral • Tidak mempengaruhi total saldo akun.
+            Netral • {{ $transferCount }} rotasi • Tidak mempengaruhi total saldo akun.
           </p>
 </div>
 </div>
@@ -278,28 +229,36 @@
 <span class="material-symbols-outlined text-error text-[20px]">priority_high</span>
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Pengeluaran Terbesar</h3>
 </div>
-<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">Bulan Mei</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">{{ $periodName }}</span>
 </div>
-<div class="flex items-center gap-space-md my-space-sm p-space-sm rounded-xl bg-surface-container-low">
-<div class="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center shrink-0 text-on-surface">
-<span class="material-symbols-outlined text-[28px]">menu_book</span>
-</div>
-<div class="flex flex-col min-w-0">
-<span class="font-label-lg text-label-lg text-on-surface font-bold truncate">Buku Pemrograman Laravel</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Pendidikan &amp; Karir • GoPay</span>
-<div class="flex items-center gap-2 mt-1">
-<span class="font-headline-sm text-headline-sm text-error font-bold">-Rp75.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">20 Mei 2025</span>
-</div>
-</div>
-</div>
-<div class="p-space-sm rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
-<div class="flex items-center gap-space-xs text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px]">verified</span>
-<span class="font-body-sm text-body-sm">Porsi terhadap total beban:</span>
-</div>
-<span class="font-label-lg text-label-lg text-on-surface font-bold">21.4%</span>
-</div>
+@if($largestExpense)
+  <div class="flex items-center gap-space-md my-space-sm p-space-sm rounded-xl bg-surface-container-low">
+  <div class="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center shrink-0 text-on-surface">
+  <span class="material-symbols-outlined text-[28px]">payments</span>
+  </div>
+  <div class="flex flex-col min-w-0">
+  <span class="font-label-lg text-label-lg text-on-surface font-bold truncate">{{ $largestExpense->description }}</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">Dompet • {{ $largestExpense->wallet?->name ?? 'Dompet' }}</span>
+  <div class="flex items-center gap-2 mt-1">
+  <span class="font-headline-sm text-headline-sm text-error font-bold">-Rp{{ number_format($largestExpense->amount, 0, ',', '.') }}</span>
+  <span class="font-label-sm text-label-sm text-on-surface-variant">{{ $largestExpense->transaction_date->locale('id')->translatedFormat('d M Y') }}</span>
+  </div>
+  </div>
+  </div>
+  <div class="p-space-sm rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+  <div class="flex items-center gap-space-xs text-on-surface-variant">
+  <span class="material-symbols-outlined text-[18px]">verified</span>
+  <span class="font-body-sm text-body-sm">Porsi terhadap total beban:</span>
+  </div>
+  <span class="font-label-lg text-label-lg text-on-surface font-bold">{{ $largestExpensePercentage }}%</span>
+  </div>
+@else
+  <div class="flex flex-col items-center justify-center py-8 text-center bg-surface-container-low/50 rounded-xl my-auto">
+    <span class="material-symbols-outlined text-on-surface-variant text-[28px] mb-2">savings</span>
+    <p class="font-label-md text-label-md text-on-surface font-medium">Tidak ada pengeluaran</p>
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Belum ada pengeluaran tercatat pada bulan ini.</p>
+  </div>
+@endif
 </div>
 <!-- Spending Breakdown Visual (7 Cols) -->
 <div class="lg:col-span-7 flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-2xl shadow-sm">
@@ -308,52 +267,58 @@
 <span class="material-symbols-outlined text-secondary text-[20px]">donut_small</span>
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Komposisi Pengeluaran Dompet</h3>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Total: Rp350.000</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Total: Rp{{ number_format($totalExpense, 0, ',', '.') }}</span>
 </div>
-<!-- Multi-segment visual bar -->
-<div class="w-full flex flex-col gap-space-sm my-space-xs">
-<div class="w-full h-4 rounded-full bg-surface-container-low flex overflow-hidden">
-<div class="h-full bg-surface-container-highest transition-all" style="width: 57%;" title="GoPay 57%"></div>
-<div class="h-full bg-secondary-fixed transition-all" style="width: 29%;" title="Cash 29%"></div>
-<div class="h-full bg-surface-container-high transition-all" style="width: 14%;" title="DANA 14%"></div>
-</div>
-<!-- Progress Legend Rows -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
-<div class="flex flex-col p-space-xs rounded-xl bg-surface-container-low">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-1.5">
-<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest"></span>
-<span class="font-label-md text-label-md text-on-surface font-semibold">GoPay</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">57.1%</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface font-semibold mt-1">Rp200.000</span>
-</div>
-<div class="flex flex-col p-space-xs rounded-xl bg-surface-container-low">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-1.5">
-<span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed"></span>
-<span class="font-label-md text-label-md text-on-surface font-semibold">Cash</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">28.6%</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface font-semibold mt-1">Rp100.000</span>
-</div>
-<div class="flex flex-col p-space-xs rounded-xl bg-surface-container-low">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-1.5">
-<span class="w-2.5 h-2.5 rounded-full bg-surface-container-high"></span>
-<span class="font-label-md text-label-md text-on-surface font-semibold">DANA</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">14.3%</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface font-semibold mt-1">Rp50.000</span>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between text-on-surface-variant pt-space-xs">
-<span class="font-body-sm text-body-sm">Pola pengeluaran didominasi e-wallet untuk kebutuhan edukasi &amp; konsumsi harian.</span>
-</div>
+@if($totalExpense > 0 && $expenseByWallet->isNotEmpty())
+  @php
+    $barColors = [
+      'bg-surface-container-highest',
+      'bg-secondary-fixed',
+      'bg-surface-container-high',
+      'bg-tertiary-fixed',
+      'bg-primary-fixed',
+    ];
+    $dotColors = [
+      'bg-surface-container-highest',
+      'bg-secondary-fixed',
+      'bg-surface-container-high',
+      'bg-tertiary-fixed',
+      'bg-primary-fixed',
+    ];
+  @endphp
+  <!-- Multi-segment visual bar -->
+  <div class="w-full flex flex-col gap-space-sm my-space-xs">
+  <div class="w-full h-4 rounded-full bg-surface-container-low flex overflow-hidden">
+    @foreach($expenseByWallet as $index => $item)
+      <div class="h-full {{ $barColors[$index % count($barColors)] }} transition-all" style="width: {{ $item->percentage }}%;" title="{{ $item->wallet_name }} {{ $item->percentage }}%"></div>
+    @endforeach
+  </div>
+  <!-- Progress Legend Rows -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
+    @foreach($expenseByWallet as $index => $item)
+      <div class="flex flex-col p-space-xs rounded-xl bg-surface-container-low">
+      <div class="flex items-center justify-between">
+      <div class="flex items-center gap-1.5">
+      <span class="w-2.5 h-2.5 rounded-full {{ $dotColors[$index % count($dotColors)] }}"></span>
+      <span class="font-label-md text-label-md text-on-surface font-semibold truncate">{{ $item->wallet_name }}</span>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant font-bold">{{ $item->percentage }}%</span>
+      </div>
+      <span class="font-body-md text-body-md text-on-surface font-semibold mt-1">Rp{{ number_format($item->amount, 0, ',', '.') }}</span>
+      </div>
+    @endforeach
+  </div>
+  </div>
+  <div class="flex items-center justify-between text-on-surface-variant pt-space-xs">
+  <span class="font-body-sm text-body-sm">Pola pengeluaran berdasarkan beban dompet pada periode {{ $periodName }}.</span>
+  </div>
+@else
+  <div class="flex flex-col items-center justify-center py-8 text-center bg-surface-container-low/50 rounded-xl my-auto">
+    <span class="material-symbols-outlined text-on-surface-variant text-[28px] mb-2">pie_chart</span>
+    <p class="font-label-md text-label-md text-on-surface font-medium">Belum ada komposisi</p>
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Catatan pengeluaran akan ditampilkan dalam grafik komposisi dompet.</p>
+  </div>
+@endif
 </div>
 </div>
 <!-- RECENT TRANSACTIONS TABLE / LIST -->
@@ -366,7 +331,7 @@
 <!-- Filter Segmented Tabs -->
 <div class="flex items-center p-1 bg-surface-container-low rounded-xl" id="transaction-filters">
 <button class="filter-tab px-3 py-1.5 rounded-lg font-label-md text-label-md font-semibold bg-surface-container-lowest text-on-surface shadow-sm transition-all" data-filter="all" type="button">
-            Semua (5)
+            Semua ({{ $recentTransactions->count() }})
           </button>
 <button class="filter-tab px-3 py-1.5 rounded-lg font-label-md text-label-md font-semibold text-on-surface-variant hover:text-on-surface transition-all" data-filter="income" type="button">
             Pemasukan
@@ -381,144 +346,86 @@
 </div>
 <!-- Transaction Items Feed -->
 <div class="flex flex-col gap-space-xs" id="transaction-list">
-<!-- Row 1: Uang Saku (Income) -->
-<div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="income">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="w-11 h-11 rounded-full bg-secondary-fixed/50 text-secondary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[22px]">payments</span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-2">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Uang Saku</span>
-<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">Income</span>
-</div>
-<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-<span>Dompet: <strong class="font-semibold text-on-surface">Cash</strong></span>
-<span>•</span>
-<span>24 Mei 2025</span>
-</div>
-</div>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-sm">
-<span class="font-numerical-ledger text-numerical-ledger text-secondary font-bold">+Rp500.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Kas Fisik Masuk</span>
-</div>
-</div>
-<!-- Row 2: Makan Siang Padang (Expense) -->
-<div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="expense">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="w-11 h-11 rounded-full bg-error-container/60 text-error flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[22px]">restaurant</span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-2">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Makan Siang Padang</span>
-<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">Expense</span>
-</div>
-<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-<span>Dompet: <strong class="font-semibold text-on-surface">GoPay</strong></span>
-<span>•</span>
-<span>23 Mei 2025</span>
-</div>
-</div>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-sm">
-<span class="font-numerical-ledger text-numerical-ledger text-error font-bold">-Rp25.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Makanan &amp; Minuman</span>
-</div>
-</div>
-<!-- Row 3: Top Up GoPay (Transfer) -->
-<div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="transfer">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="w-11 h-11 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[22px]">swap_horiz</span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-2">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Top Up GoPay</span>
-<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">Transfer</span>
-</div>
-<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-<span>Alur: <strong class="font-semibold text-on-surface">DANA → GoPay</strong></span>
-<span>•</span>
-<span>22 Mei 2025</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">DANA berkurang, GoPay bertambah</span>
-</div>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-sm">
-<span class="font-numerical-ledger text-numerical-ledger text-on-surface font-bold">Rp50.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Netral Antar Dompet</span>
-</div>
-</div>
-<!-- Row 4: Buku Referensi (Expense) -->
-<div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="expense">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="w-11 h-11 rounded-full bg-error-container/60 text-error flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[22px]">menu_book</span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-2">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Buku Referensi</span>
-<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">Expense</span>
-</div>
-<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-<span>Dompet: <strong class="font-semibold text-on-surface">GoPay</strong></span>
-<span>•</span>
-<span>20 Mei 2025</span>
-</div>
-</div>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-sm">
-<span class="font-numerical-ledger text-numerical-ledger text-error font-bold">-Rp75.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Pendidikan</span>
-</div>
-</div>
-<!-- Row 5: Gaji Freelance Web (Income) -->
-<div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="income">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="w-11 h-11 rounded-full bg-secondary-fixed/50 text-secondary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[22px]">work</span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-2">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Gaji Freelance Web</span>
-<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">Income</span>
-</div>
-<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-<span>Dompet: <strong class="font-semibold text-on-surface">DANA</strong></span>
-<span>•</span>
-<span>18 Mei 2025</span>
-</div>
-</div>
-</div>
-<div class="flex flex-col items-end shrink-0 pl-space-sm">
-<span class="font-numerical-ledger text-numerical-ledger text-secondary font-bold">+Rp500.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Pendapatan Proyek</span>
-</div>
-</div>
+@forelse($recentTransactions as $tx)
+  @php
+    $isIncome = $tx->type === 'income';
+    $isExpense = $tx->type === 'expense';
+    $isTransfer = $tx->type === 'transfer';
+
+    $icon = $isIncome ? 'payments' : ($isExpense ? 'restaurant' : 'swap_horiz');
+    $iconBg = $isIncome
+      ? 'bg-secondary-fixed/50 text-secondary'
+      : ($isExpense ? 'bg-error-container/60 text-error' : 'bg-surface-container-highest text-on-surface');
+    $badgeBg = $isIncome
+      ? 'bg-secondary-fixed text-on-secondary-fixed'
+      : ($isExpense ? 'bg-error-container text-on-error-container' : 'bg-surface-container-high text-on-surface');
+    $amountColor = $isIncome
+      ? 'text-secondary'
+      : ($isExpense ? 'text-error' : 'text-on-surface');
+    $amountPrefix = $isIncome ? '+Rp' : ($isExpense ? '-Rp' : 'Rp');
+  @endphp
+  <div class="tx-item flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" data-type="{{ $tx->type }}">
+  <div class="flex items-center gap-space-sm min-w-0">
+  <div class="w-11 h-11 rounded-full {{ $iconBg }} flex items-center justify-center shrink-0">
+  <span class="material-symbols-outlined text-[22px]">{{ $icon }}</span>
+  </div>
+  <div class="flex flex-col min-w-0">
+  <div class="flex items-center gap-2">
+  <span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">{{ $tx->description }}</span>
+  <span class="px-2 py-0.5 rounded-full {{ $badgeBg }} font-label-sm text-label-sm font-semibold">{{ ucfirst($tx->type) }}</span>
+  </div>
+  <div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm mt-0.5">
+  @if($isTransfer)
+    <span>Alur: <strong class="font-semibold text-on-surface">{{ $tx->wallet?->name ?? '-' }} → {{ $tx->destinationWallet?->name ?? '-' }}</strong></span>
+  @else
+    <span>Dompet: <strong class="font-semibold text-on-surface">{{ $tx->wallet?->name ?? '-' }}</strong></span>
+  @endif
+  <span>•</span>
+  <span>{{ $tx->transaction_date->locale('id')->translatedFormat('d M Y') }}</span>
+  </div>
+  @if($isTransfer)
+    <span class="font-label-sm text-label-sm text-on-surface-variant">{{ $tx->wallet?->name ?? '-' }} berkurang, {{ $tx->destinationWallet?->name ?? '-' }} bertambah</span>
+  @endif
+  </div>
+  </div>
+  <div class="flex flex-col items-end shrink-0 pl-space-sm">
+  <span class="font-numerical-ledger text-numerical-ledger {{ $amountColor }} font-bold">{{ $amountPrefix }}{{ number_format($tx->amount, 0, ',', '.') }}</span>
+  <span class="font-label-sm text-label-sm text-on-surface-variant">
+    {{ $isIncome ? 'Saldo bertambah' : ($isExpense ? 'Saldo berkurang' : 'Netral Antar Dompet') }}
+  </span>
+  </div>
+  </div>
+@empty
+  <div class="py-12 text-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-[32px] opacity-60 mb-2">receipt_long</span>
+    <p class="font-label-md text-label-md font-semibold text-on-surface">Belum ada transaksi</p>
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Catatan mutasi pemasukan, pengeluaran, dan transfer akan tampil di sini.</p>
+  </div>
+@endforelse
 </div>
 <div class="pt-space-md flex items-center justify-center">
-<button class="flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors" type="button">
+<a href="{{ route('transactions.index') }}" class="flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors">
 <span>Lihat Riwayat Selengkapnya</span>
 <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-</button>
+</a>
 </div>
 </div>
 </div>
+@if(session('success'))
 <!-- Subtle Toast Notification (Floating in Bottom Corner) -->
 <div class="fixed bottom-20 lg:bottom-6 right-6 z-50 flex items-center gap-space-sm px-space-md py-3 rounded-xl bg-primary-container text-on-primary shadow-xl transition-all duration-300" id="toast-notification">
 <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-on-secondary text-[16px]">check</span>
 </div>
 <div class="flex flex-col text-left">
-<span class="font-label-md text-label-md font-semibold text-on-primary">Transfer Berhasil</span>
-<span class="font-body-sm text-body-sm text-primary-fixed-dim">Rp50.000 dipindahkan dari DANA ke GoPay</span>
+<span class="font-label-md text-label-md font-semibold text-on-primary">Sukses</span>
+<span class="font-body-sm text-body-sm text-primary-fixed-dim">{{ session('success') }}</span>
 </div>
 <button class="ml-2 text-primary-fixed-dim hover:text-on-primary" id="close-toast" type="button">
 <span class="material-symbols-outlined text-[18px]">close</span>
 </button>
 </div>
+@endif
 </div>
 <script>
   (function () {

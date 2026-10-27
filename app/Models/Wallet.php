@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\WalletFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wallet extends Model
 {
+    /** @use HasFactory<WalletFactory> */
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -54,5 +60,41 @@ class Wallet extends Model
     public function incomingTransfers(): HasMany
     {
         return $this->hasMany(Transaction::class, 'destination_wallet_id');
+    }
+
+    /**
+     * Scope a query to include the calculated current balance.
+     *
+     * Saldo dompet = saldo awal + pemasukan - pengeluaran + transfer masuk - transfer keluar.
+     */
+    public function scopeWithCurrentBalance(Builder $query): Builder
+    {
+        return $query->select('wallets.*')
+            ->selectRaw('
+                (
+                    wallets.initial_balance
+                    + COALESCE((SELECT SUM(amount) FROM transactions WHERE transactions.wallet_id = wallets.id AND transactions.type = \'income\'), 0)
+                    - COALESCE((SELECT SUM(amount) FROM transactions WHERE transactions.wallet_id = wallets.id AND transactions.type = \'expense\'), 0)
+                    - COALESCE((SELECT SUM(amount) FROM transactions WHERE transactions.wallet_id = wallets.id AND transactions.type = \'transfer\'), 0)
+                    + COALESCE((SELECT SUM(amount) FROM transactions WHERE transactions.destination_wallet_id = wallets.id AND transactions.type = \'transfer\'), 0)
+                ) as current_balance
+            ');
+    }
+
+    /**
+     * Get current balance attribute.
+     */
+    public function getCurrentBalanceAttribute(): float
+    {
+        if (array_key_exists('current_balance', $this->attributes)) {
+            return (float) $this->attributes['current_balance'];
+        }
+
+        $income = (float) $this->transactions()->where('type', 'income')->sum('amount');
+        $expense = (float) $this->transactions()->where('type', 'expense')->sum('amount');
+        $transferOut = (float) $this->transactions()->where('type', 'transfer')->sum('amount');
+        $transferIn = (float) $this->incomingTransfers()->where('type', 'transfer')->sum('amount');
+
+        return (float) $this->initial_balance + $income - $expense - $transferOut + $transferIn;
     }
 }
