@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,17 +20,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('/wallets', function () {
-        return view('wallets.index');
-    })->name('wallets.index');
+    Route::get('/wallets', [WalletController::class, 'index'])->name('wallets.index');
+    Route::post('/wallets', [WalletController::class, 'store'])->name('wallets.store');
+    Route::put('/wallets/{wallet}', [WalletController::class, 'update'])->name('wallets.update');
+    Route::delete('/wallets/{wallet}', [WalletController::class, 'destroy'])->name('wallets.destroy');
 
-    Route::get('/transactions', function () {
-        return view('transactions.index');
-    })->name('transactions.index');
-
-    Route::get('/transactions/create', function () {
-        return view('transactions.create');
-    })->name('transactions.create');
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
     Route::get('/transactions/{id}', function ($id) {
         return view('transactions.show');
